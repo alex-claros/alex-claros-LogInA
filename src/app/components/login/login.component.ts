@@ -1,31 +1,26 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { error } from 'console';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  standalone: true,
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  email: string = '';
-  password: string = '';
+  email = '';
+  password = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    this.authService.login(this.email, this.password).subscribe({
+    this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (response) => {
-        console.log("Respuesta del Servido: ", response);
-        alert("Login Exitoso");
+        localStorage.setItem('token', response.access_token);
+        this.router.navigate(['/dashboard']);
       },
-      error: (error) => {
-        console.log("Error: ", error);
-        alert("Credencial Incorrecta");
-      }
+      error: () => alert('Credenciales incorrectas')
     });
   }
 }
-
